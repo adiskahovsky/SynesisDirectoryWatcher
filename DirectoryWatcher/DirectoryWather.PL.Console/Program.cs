@@ -18,10 +18,10 @@ namespace DirectoryWather.PL.Console
 
         }
 
-        private async  static void Start()
+        private async static void Start()
         {
             DirectoryWatcherService directoryWatcherService = new DirectoryWatcherService() { MainDirectoryPath = @"C:\Kahovsky" };
-            var result = await directoryWatcherService.GetFoldersInfoAsync(@"C:\Kahovsky");
+            await directoryWatcherService.Start(@"C:\Kahovsky\Новая папка");
 
         }
     }

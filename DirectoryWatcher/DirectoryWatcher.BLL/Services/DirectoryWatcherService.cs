@@ -6,11 +6,17 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Controls.Primitives;
 
 namespace DirectoryWatcher.BLL.Services
 {
     internal class DirectoryWatcherService
     {
+
+
+        private Object lockObj;
+
+        List<IDirectoryItem> DirectoryItemsDtos = new List<IDirectoryItem>();
 
         private string _mainDirectoryPath;
 
@@ -21,6 +27,16 @@ namespace DirectoryWatcher.BLL.Services
         }
 
 
+        public event EventHandler<IDirectoryItem> NewDirectoryParsed;
+        public event EventHandler<IDirectoryItem> ItemChanged;
+
+
+
+        public DirectoryWatcherService()
+        {
+            lockObj = new Object();
+        }
+                    
 
         public async Task<ICollection<IDirectoryItem>> GetFoldersInfoAsync(string directoryPath)
         {
@@ -33,17 +49,20 @@ namespace DirectoryWatcher.BLL.Services
 
                 List<IDirectoryItem> result = new List<IDirectoryItem>();
            
-                result = result.Union( directories.Select(p => new FolderFullInfo { FullName = p.FullName, Name = p.Name,DirectoryItems = null })).ToList();
+                result = result.Union(directories.Select(p => new FolderFullInfo { FullName = p.FullName, Name = p.Name, DirectoryItems = null })).ToList();
 
-                result = result.Union(files.Select(p=> new FileFullInfo() { FullName = p.FullName,Name = p.Name,FileByteCount = p.Length})).ToList();
+                result = result.Union(files.Select(p => new FileFullInfo() { FullName = p.FullName, Name = p.Name, FileByteCount = p.Length })).ToList();
+                
 
                 foreach (var item in result.Where(p => p.GetType().Equals(typeof(FolderFullInfo))).Cast<FolderFullInfo>())
                 {
                     item.DirectoryItems = await GetFoldersInfoAsync(item.FullName);
 
+                    //NewDirectoryParsed(this, (IDirectoryItem)item);
+
 
                 }
-
+                
 
                 return result;
 
@@ -56,10 +75,26 @@ namespace DirectoryWatcher.BLL.Services
 
 
 
-
-        public void Start()
+        public async void DirectoryTracking(ICollection<IDirectoryItem> directoryItems)
         {
+            await Task.Run(()=> {
+
+                while (true)
+                {
+                    var result = DirectoryItemsDtos.Select(p => directoryItems.Where(o => p != o));
+                }
+            });
+
             
+
+        }
+
+
+        public async Task Start(string startDirectoryPath)
+        {
+            var res = await GetFoldersInfoAsync(startDirectoryPath);
+            //DirectoryTracking(res);
+
 
         }
 
