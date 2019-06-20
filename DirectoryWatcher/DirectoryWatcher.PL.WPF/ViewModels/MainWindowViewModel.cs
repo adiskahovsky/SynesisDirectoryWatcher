@@ -7,6 +7,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Collections;
 
 namespace DirectoryWatcher.PL.WPF.ViewModels
 {
@@ -20,16 +21,26 @@ namespace DirectoryWatcher.PL.WPF.ViewModels
             set { _directories = value; OnPropertyChanged(); }
         }
 
+        private DirectoryModel _directory;
 
+        public DirectoryModel Directory
+        {
+            get { return _directory; }
+            set { _directory = value; OnPropertyChanged(); }
+        }
 
+        public IEnumerable<DirectoryModel> SelfDirectory
+        {
+            get { yield return Directory; }
+            set { Directory = value.SingleOrDefault(); OnPropertyChanged(); }
+        }
+
+        
         public MainWindowViewModel()
         {
             Directories = new ObservableCollection<IThreeModelItem>();
             { new DirectoryModel() { FullName = "fsdfsdfds", Name = "fsdfsdfsd" }; }
-            
         }
-
-  
 
 
 

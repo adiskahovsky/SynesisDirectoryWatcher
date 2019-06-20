@@ -11,5 +11,6 @@ namespace DirectoryWatcher.PL.WPF.Interfaces
         string FullName { get; set; }
         string Name { get; set; }
 
+        
     }
 }
