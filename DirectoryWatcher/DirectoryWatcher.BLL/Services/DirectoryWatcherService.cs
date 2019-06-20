@@ -29,6 +29,8 @@ namespace DirectoryWatcher.BLL.Services
 
         public event EventHandler<IDirectoryItem> NewDirectoryParsed;
         public event EventHandler<IDirectoryItem> ItemChanged;
+        public event EventHandler<IDirectoryItem> DeletedItem;
+        public event EventHandler<IDirectoryItem> NewItem;
 
 
 
@@ -38,7 +40,7 @@ namespace DirectoryWatcher.BLL.Services
         }
                     
 
-        public async Task<ICollection<IDirectoryItem>> GetFoldersInfoAsync(string directoryPath)
+        public async Task<ICollection<IDirectoryItem>> GetFolderInfoAsync(string directoryPath)
         {
 
             return   await Task<ICollection<DirectoryInfo>>.Run(async ()=> {
@@ -54,14 +56,14 @@ namespace DirectoryWatcher.BLL.Services
                 result = result.Union(files.Select(p => new FileFullInfo() { FullName = p.FullName, Name = p.Name, FileByteCount = p.Length })).ToList();
                 
 
-                foreach (var item in result.Where(p => p.GetType().Equals(typeof(FolderFullInfo))).Cast<FolderFullInfo>())
-                {
-                    item.DirectoryItems = await GetFoldersInfoAsync(item.FullName);
+                //foreach (var item in result.Where(p => p.GetType().Equals(typeof(FolderFullInfo))).Cast<FolderFullInfo>())
+                //{
+                   // item.DirectoryItems = await GetFoldersInfoAsync(item.FullName);
 
                     //NewDirectoryParsed(this, (IDirectoryItem)item);
 
 
-                }
+                //}
                 
 
                 return result;
@@ -77,7 +79,7 @@ namespace DirectoryWatcher.BLL.Services
 
         public async void DirectoryTracking(ICollection<IDirectoryItem> directoryItems, ICollection<IDirectoryItem> DirectoryItemsDtos)
         {
-            if (directoryItems != null)
+            if (directoryItems != null && DirectoryItemsDtos!= null)
             {
                 await Task.Run(() =>
                 {
@@ -135,10 +137,10 @@ namespace DirectoryWatcher.BLL.Services
         public async Task Start(string startDirectoryPath)
         {
 
-            var res = await GetFoldersInfoAsync(startDirectoryPath);
-            DirectoryItemsDtos = res.ToList();
-            res.ToList()[0].FullName = "hui";
-            DirectoryTracking(res);
+            //var res = await GetFoldersInfoAsync(startDirectoryPath);
+            //DirectoryItemsDtos = res.ToList();
+            //res.ToList()[0].FullName = "hui";
+            //DirectoryTracking(res);
 
 
         }

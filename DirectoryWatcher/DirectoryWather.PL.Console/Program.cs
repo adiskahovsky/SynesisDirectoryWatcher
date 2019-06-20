@@ -9,10 +9,12 @@ namespace DirectoryWather.PL.Console
 {
     class Program
     {
+
         static void Main(string[] args)
         {
-            Start();
+            //Start();
 
+            
  
             System.Console.ReadKey();
 
@@ -20,6 +22,8 @@ namespace DirectoryWather.PL.Console
 
         private async static void Start()
         {
+            
+
             DirectoryWatcherService directoryWatcherService = new DirectoryWatcherService() { MainDirectoryPath = @"C:\Kahovsky" };
             await directoryWatcherService.Start(@"D:\untitled5");
 
