@@ -16,7 +16,7 @@ namespace DirectoryWatcher.BLL.Services
 
         private Object lockObj;
 
-        List<IDirectoryItem> DirectoryItemsDtos = new List<IDirectoryItem>();
+      //  List<IDirectoryItem> DirectoryItemsDtos = new List<IDirectoryItem>();
 
         private string _mainDirectoryPath;
 
@@ -75,15 +75,57 @@ namespace DirectoryWatcher.BLL.Services
 
 
 
-        public async void DirectoryTracking(ICollection<IDirectoryItem> directoryItems)
+        public async void DirectoryTracking(ICollection<IDirectoryItem> directoryItems, ICollection<IDirectoryItem> DirectoryItemsDtos)
         {
-            await Task.Run(()=> {
-
-                while (true)
+            if (directoryItems != null)
+            {
+                await Task.Run(() =>
                 {
-                    var result = DirectoryItemsDtos.Select(p => directoryItems.Where(o => p != o));
-                }
-            });
+
+                    while (true)
+                    {
+
+                        foreach (var directoryItemDto in DirectoryItemsDtos.Where(p=> p.GetType().Equals(typeof(FolderFullInfo))).Cast<FolderFullInfo>())//foreach (var directoryItem in directoryItems)
+                        {
+                            bool flag = false;
+                            foreach (var directoryItem in directoryItems.Where(p => p.GetType().Equals(typeof(FolderFullInfo))).Cast<FolderFullInfo>())
+                            {
+
+
+                                if (directoryItemDto.FullName.Equals(directoryItem.FullName))
+                                {
+
+                                    flag = true;
+                                    DirectoryTracking(directoryItem.DirectoryItems, directoryItemDto.DirectoryItems);
+                                }
+
+                            }
+
+                            if (!flag)
+                                ItemChanged(this, directoryItemDto);
+
+                        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                        
+
+                    }
+                });
+            }
 
             
 
@@ -92,8 +134,11 @@ namespace DirectoryWatcher.BLL.Services
 
         public async Task Start(string startDirectoryPath)
         {
+
             var res = await GetFoldersInfoAsync(startDirectoryPath);
-            //DirectoryTracking(res);
+            DirectoryItemsDtos = res.ToList();
+            res.ToList()[0].FullName = "hui";
+            DirectoryTracking(res);
 
 
         }
